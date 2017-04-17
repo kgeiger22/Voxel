@@ -1,0 +1,3 @@
+Initializing world thread
+Stopping world thread
+World thread succesfully stopped
