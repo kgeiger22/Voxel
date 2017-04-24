@@ -37,8 +37,7 @@ public class GameManager : MonoBehaviour {
         if (playerspawned == true) return;
         Destroy(_camera.gameObject);
         Destroy(UITEXT);
-
-        GameObject t = Instantiate(Resources.Load("Player"), Pos, Quaternion.identity) as GameObject;
+        Transform t = Instantiate(Resources.Load<Transform>("Player"), Pos, Quaternion.identity);
         t.transform.position = Pos;
         Player = t.transform;
         playerspawned = true;

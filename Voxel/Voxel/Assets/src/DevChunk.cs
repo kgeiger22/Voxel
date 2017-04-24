@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DevChunk : Chunk {
 
-	public DevChunk(int px, int pz, World world) : base(px, pz, world)
+	public DevChunk(int px, int py, int pz, World world) : base(px, py, pz, world)
     {
 
     }

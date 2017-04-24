@@ -42,6 +42,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
         private AudioSource m_AudioSource;
 
+        private int maxjumps = 2;
+
     
 
         // Use this for initialization
@@ -77,6 +79,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 PlayLandingSound();
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
+                m_Jump = false;
+                jumpstaken = 0;
             }
             if (!m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
             {
@@ -95,6 +99,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
+        private int jumpstaken = 0;
         private void FixedUpdate()
         {
             float speed;
@@ -115,10 +120,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (m_CharacterController.isGrounded)
             {
                 m_MoveDir.y = -m_StickToGroundForce;
+                
 
                 //Jumping from ground
                 if (m_Jump)
                 {
+                    jumpstaken += 1;
                     m_MoveDir.y = m_JumpSpeed;
                     PlayJumpSound();
                     m_Jump = false;
@@ -128,8 +135,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             else
             {
                 //Multi-jump
-                if (m_Jump)
+                if (m_Jump && jumpstaken < maxjumps)
                 {
+                    jumpstaken += 1;
                     m_MoveDir.y = m_JumpSpeed;
                     PlayJumpSound();
                     m_Jump = false;
@@ -140,10 +148,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     //flying
                     if (CrossPlatformInputManager.GetButton("Jump") && m_MoveDir.y < 0)
                     {
-                        m_MoveDir.y = -00.5f;
+                        m_MoveDir.y = -0.6f;
                     }
                     //Apply gravity
-                    else m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime;
+                    else
+                    {
+                        m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime;
+                    }
                 }
             }
             m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);

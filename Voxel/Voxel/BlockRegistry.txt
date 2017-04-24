@@ -1,0 +1,8 @@
+CurrentID: 0, Blockname: Dirt, BlockID: 0
+CurrentID: 1, Blockname: Stone, BlockID: 1
+CurrentID: 2, Blockname: Bedrock, BlockID: 2
+CurrentID: 3, Blockname: Air, BlockID: 3
+CurrentID: 4, Blockname: Cobblestone, BlockID: 4
+CurrentID: 5, Blockname: Sand, BlockID: 5
+CurrentID: 6, Blockname: White, BlockID: 6
+CurrentID: 7, Blockname: Gray, BlockID: 7

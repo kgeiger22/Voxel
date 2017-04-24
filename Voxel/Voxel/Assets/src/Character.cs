@@ -2,27 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Character : MonoBehaviour {
-    public float firerate = 0.2f;
+public class Character : Player {
+    public float firerate = 0.01f;
     private float cooldown = 0;
     private Transform Add;
     private Transform Delete;
     private Block BlockType = Block.Dirt;
     private List<Projectile> Bullets = new List<Projectile>();
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    protected override void Start () {
+        base.Start();
+        maxjumps = 4;
         Add = Instantiate(Resources.Load<Transform>("Add"), transform.position, Quaternion.identity) as Transform;
         Delete = Instantiate(Resources.Load<Transform>("Delete"), transform.position, Quaternion.identity) as Transform;
     }
 
 
-
     //private List<Vector3> WaitingToAddBlocks = new List<Vector3>();
     // Update is called once per frame
-    void Update () {
-        //Releasing left click
-        //Places block at position
+    protected override void Update () {
+        base.Update();
         foreach(Projectile p in new List<Projectile>(Bullets))
         {
             if(p.IsDead == true)
@@ -31,6 +31,8 @@ public class Character : MonoBehaviour {
                 Destroy(p.gameObject);
             }
         }
+        //Releasing left click
+        //Places block at position
         if (Input.GetMouseButtonUp(0))
         {
             Add.transform.GetComponent<MeshRenderer>().enabled = false;
@@ -122,6 +124,12 @@ public class Character : MonoBehaviour {
         {
             Vector3 startpos = transform.position + new Vector3(0, 0.3f, 0);
             Bullets.Add(Instantiate(Resources.Load<Projectile>("Fireball"), startpos, Camera.main.transform.rotation));
+            cooldown = firerate;
+        }
+        if (Input.GetKey(KeyCode.Q) && cooldown < 0)
+        {
+            Vector3 startpos = transform.position + new Vector3(0, 0.3f, 0);
+            Bullets.Add(Instantiate(Resources.Load<Projectile>("SMGBullet"), startpos, Camera.main.transform.rotation));
             cooldown = firerate;
         }
         else cooldown -= Time.deltaTime;

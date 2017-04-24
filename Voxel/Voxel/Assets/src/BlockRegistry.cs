@@ -7,7 +7,10 @@ public class BlockRegistry {
     private static List<Block> _REGISTEREDBLOCKS = new List<Block>();
     public static void RegisterBlock(Block B)
     {
-        _REGISTEREDBLOCKS.Add(B);
+        if (!_REGISTEREDBLOCKS.Contains(B))
+        {
+            _REGISTEREDBLOCKS.Add(B);
+        }
     }
 
     public static void RegisterBlocks()

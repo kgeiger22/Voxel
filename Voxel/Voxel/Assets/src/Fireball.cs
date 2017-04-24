@@ -9,14 +9,14 @@ public class Fireball : Projectile {
     {
         base.Start();
         lifetime = 8;
-        velocity = 40;
+        velocity = 60;
         transform.Rotate(-7, 0, 0);
     }
 
     private bool alreadyhit = false;
     private float fallingacceleration = -0.14f;
     private bool DoneRotating = false;
-    private int explosionsize = 2;
+    private int explosionsize = -1;
     override protected void Update ()
     {
         base.Update();
@@ -45,8 +45,7 @@ public class Fireball : Projectile {
                         }
                     }
                 }
-                Transform exp = Instantiate<Transform>(Resources.Load<Transform>("Explosion"), transform.position, Quaternion.identity);
-                exp.transform.localScale *= explosionsize;
+                Instantiate<Transform>(Resources.Load<Transform>("FireballExplosion"), transform.position, Quaternion.identity);
                 Destroy(gameObject);
             }
         }

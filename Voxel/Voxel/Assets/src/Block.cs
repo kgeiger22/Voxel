@@ -13,6 +13,11 @@ public class Block : ITickable
     public static Block Air = new Block("Air", true);
     public static Block Cobblestone = new Block("Cobblestone", false, "textures/blocks/cobblestone.png");
     public static Block Sand = new Block("Sand", false, "textures/blocks/sand.png");
+    public static Block White = new Block("White", false, "textures/blocks/white.png");
+    public static Block Gray = new Block("Gray", false, "textures/blocks/gray.png");
+    public static Block Black = new Block("Black", false, "textures/blocks/black.png");
+
+
 
 
 

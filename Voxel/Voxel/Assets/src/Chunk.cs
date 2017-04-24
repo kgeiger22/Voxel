@@ -13,19 +13,23 @@ public class Chunk : ITickable
     public static readonly int ChunkHeight = 20;
 
     private Block[,,] _Blocks;
+    private int[,,] _BlockHP;
 
     public int PosX { get; private set; }
+    public int PosY { get; private set; }
     public int PosZ { get; private set; }
-    public Chunk(int px, int pz, World world)
+    public Chunk(int px, int py, int pz, World world)
     {
         PosX = px;
+        PosY = py;
         PosZ = pz;
         this.world = world;
     }
 
-    public Chunk(int px, int pz, int[,,] _data, World world)
+    public Chunk(int px, int py, int pz, int[,,] _data, World world)
     {
         PosX = px;
+        PosY = py;
         PosZ = pz;
         LoadChunkFromData(_data);
         HasGenerated = true;
@@ -61,17 +65,24 @@ public class Chunk : ITickable
             {
                 for (int z = 0; z < ChunkWidth; ++z)
                 {
-                    float perlin = GetHeight(x, z, y);
-                    if (perlin > GameManager.Scutoff)
+                    //Above the ground
+                    //if (PosY > 0) _Blocks[x, y, z] = Block.Air;
+                    //On ground level
+                    if (true)
                     {
-                        _Blocks[x, y, z] = Block.Air;
+                        float perlin = GetHeight(x, z, y + ChunkHeight * PosY);
+                        if (perlin > GameManager.Scutoff)
+                        {
+                            _Blocks[x, y, z] = Block.Air;
+                        }
+                        else
+                        {
+                            if (perlin < GameManager.Scutoff / 1.5) _Blocks[x, y, z] = Block.Gray;
+                            else _Blocks[x, y, z] = Block.White;
+                        }
+                        if (y <= 1 && PosY == 0) _Blocks[x, y, z] = Block.Black;
+                        if (PosX == 0 && PosZ == 0 && PosY == 0) _Blocks[x, y, z] = Block.Black;
                     }
-                    else
-                    {
-                        if (perlin < GameManager.Scutoff / 2) _Blocks[x, y, z] = Block.Dirt;
-                        else _Blocks[x, y, z] = Block.Stone;
-                    }
-                    if (y <= 1) _Blocks[x, y, z] = Block.Bedrock;
                 } 
             }
         }
@@ -101,7 +112,6 @@ public class Chunk : ITickable
 
         if (!HasDrawn && HasGenerated && !Drawlock)
         {
-            
 
             Drawlock = true;
             data = new MeshData();
@@ -116,7 +126,6 @@ public class Chunk : ITickable
 
                 }
             }
-            
             HasDrawn = true;
             Drawlock = false;
         }
@@ -145,10 +154,12 @@ public class Chunk : ITickable
                 t.gameObject.AddComponent<MeshRenderer>();
                 t.gameObject.AddComponent<MeshCollider>();
                 t.gameObject.GetComponent<MeshRenderer>().material = Resources.Load<Material>("Chunkmat");
-                t.transform.position = new Vector3(PosX * ChunkWidth, 0, PosZ * ChunkWidth);
+                t.transform.position = new Vector3(PosX * ChunkWidth, PosY * ChunkHeight, PosZ * ChunkWidth);
                 Texture2D tmp = new Texture2D(0, 0);
                 tmp.LoadImage(System.IO.File.ReadAllBytes("textures/atlas.png"));
                 tmp.filterMode = FilterMode.Point;
+                tmp.wrapMode = TextureWrapMode.Clamp;
+                tmp.anisoLevel = 3;
                 t.gameObject.GetComponent<MeshRenderer>().material.mainTexture = tmp;
 
 
@@ -172,12 +183,13 @@ public class Chunk : ITickable
     internal void SetBlock(int x, int y, int z, Block block)
     {
         _Blocks[x, y, z] = block;
+        //Debug.Log(string.Format("X: {0}, Y: {1}, Z: {2}", x, y, z));
         NeedToUpdate = true;
     }
 
     public void Degenerate()
     {
-        Serializer.Serialize_ToFile_FullPath(FileManager.GetChunkString(PosX, PosZ), GetChunkSaveData());
+        Serializer.Serialize_ToFile_FullPath(FileManager.GetChunkString(PosX, PosY, PosZ), GetChunkSaveData());
         GameManager._Instance.RegisterDelegate( new Action(() => {
             GameObject.Destroy(go);
 

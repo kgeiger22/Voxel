@@ -41,6 +41,8 @@ public class Int3
 
 public class MathHelper {
 
+    static private float f = 1f;
+
     public static MeshData DrawCube(Chunk chunk, Block[,,] _Blocks, Block block, int x, int y, int z, Vector2[] _uvmap)
     {
         MeshData d = new MeshData();
@@ -55,9 +57,9 @@ public class MathHelper {
             d.Merge(new MeshData( // Bottom Face
         new List<Vector3>() {
             new Vector3(0,0,0),
-            new Vector3(0,0,1),
-            new Vector3(1,0,0),
-            new Vector3(1,0,1)
+            new Vector3(0,0,f),
+            new Vector3(f,0,0),
+            new Vector3(f,0,f)
         },
         new List<int>() {
                  0,2,1   ,3,1,2
@@ -71,10 +73,10 @@ public class MathHelper {
         {
             d.Merge(new MeshData( // Top Face
           new System.Collections.Generic.List<Vector3>() {
-            new Vector3(0,1,0),
-            new Vector3(0,1,1),
-            new Vector3(1,1,0),
-            new Vector3(1,1,1)
+            new Vector3(0,f,0),
+            new Vector3(0,f,f),
+            new Vector3(f,f,0),
+            new Vector3(f,f,f)
            },
            new System.Collections.Generic.List<int>() {
                  0,1,2    ,3,2,1
@@ -88,10 +90,10 @@ public class MathHelper {
         {
             d.Merge(new MeshData( // Back Face
           new System.Collections.Generic.List<Vector3>() {
-            new Vector3(1,0,0),
-            new Vector3(1,0,1),
-            new Vector3(1,1,0),
-            new Vector3(1,1,1)
+            new Vector3(f,0,0),
+            new Vector3(f,0,f),
+            new Vector3(f,f,0),
+            new Vector3(f,f,f)
            },
            new System.Collections.Generic.List<int>() {
                  0,2,1,3,1,2
@@ -107,9 +109,9 @@ public class MathHelper {
             d.Merge(new MeshData( // Front Face
          new System.Collections.Generic.List<Vector3>() {
             new Vector3(0,0,0),
-            new Vector3(0,0,1),
-            new Vector3(0,1,0),
-            new Vector3(0,1,1)
+            new Vector3(0,0,f),
+            new Vector3(0,f,0),
+            new Vector3(0,f,f)
           },
           new System.Collections.Generic.List<int>() {
                  0,1,2,3,2,1
@@ -124,10 +126,10 @@ public class MathHelper {
         {
             d.Merge(new MeshData( // Right Face
           new System.Collections.Generic.List<Vector3>() {
-            new Vector3(0,0,1),
-            new Vector3(1,0,1),
-            new Vector3(0,1,1),
-            new Vector3(1,1,1)
+            new Vector3(0,0,f),
+            new Vector3(f,0,f),
+            new Vector3(0,f,f),
+            new Vector3(f,f,f)
            },
            new System.Collections.Generic.List<int>() {
                  0,1,2,3,2,1
@@ -143,9 +145,9 @@ public class MathHelper {
             d.Merge(new MeshData( // Left Face
          new System.Collections.Generic.List<Vector3>() {
             new Vector3(0,0,0),
-            new Vector3(1,0,0),
-            new Vector3(0,1,0),
-            new Vector3(1,1,0)
+            new Vector3(f,0,0),
+            new Vector3(0,f,0),
+            new Vector3(f,f,0)
          },
          new System.Collections.Generic.List<int>() {
                  0,2,1    ,3,1,2
@@ -164,21 +166,22 @@ public class MathHelper {
 
    internal static void AddBlock(Vector3 roundedposition, Block block)
     {
-        if (roundedposition.y >= Chunk.ChunkHeight) return;
-
-        int chunkposx = Mathf.FloorToInt(roundedposition.x / Chunk.ChunkWidth);
-        int chunkposz = Mathf.FloorToInt(roundedposition.z / Chunk.ChunkWidth);
-
+        //if (roundedposition.y >= Chunk.ChunkHeight) return;
+        Int3 chunkpos = new Int3(0,0,0);
+        chunkpos.x = Mathf.FloorToInt(roundedposition.x / Chunk.ChunkWidth);
+        chunkpos.y = Mathf.FloorToInt(roundedposition.y / Chunk.ChunkHeight);
+        chunkpos.z = Mathf.FloorToInt(roundedposition.z / Chunk.ChunkWidth);
 
         Chunk currentchunk;
         try
         {
-            currentchunk = World._instance.GetChunk(chunkposx, chunkposz);
+            currentchunk = World._instance.GetChunk(chunkpos.x, chunkpos.y, chunkpos.z);
+            //Debug.Log(string.Format("ChunkX: {0}, ChunkY: {1}, ChunkZ: {2},", currentchunk.PosX, currentchunk.PosY, currentchunk.PosZ));
             if (currentchunk.GetType().Equals(typeof(ErroredChunk))) return;
-            int x = (int)(roundedposition.x - chunkposx * Chunk.ChunkWidth);
-            int z = (int)(roundedposition.z - chunkposz * Chunk.ChunkWidth);
-            int y = (int)(roundedposition.y);
-            currentchunk.SetBlock(x, y, z, block);
+            int x = (int)(roundedposition.x - chunkpos.x * Chunk.ChunkWidth);
+            int z = (int)(roundedposition.z - chunkpos.z * Chunk.ChunkWidth);
+            int y = (int)(roundedposition.y - chunkpos.y * Chunk.ChunkHeight);
+            if (currentchunk.GetBlockAt(x,y,z) != "Black") currentchunk.SetBlock(x, y, z, block);
 
         }
         catch (System.Exception e)

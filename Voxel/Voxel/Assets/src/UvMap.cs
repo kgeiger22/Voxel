@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class UvMap {
-    private static List<UvMap> _Maps = new List<UvMap>();
+    private static List<UvMap> _Maps =  new List<UvMap>();
     public string name;
     public Vector2[] _UVMAP;
     public UvMap(string name, Vector2[] _UVMAP)
@@ -14,6 +14,12 @@ public class UvMap {
 
     public void Register()
     {
+        /*
+        foreach(UvMap uv in _Maps)
+        {
+            if (uv.name == name) return;
+        }
+        */
         _Maps.Add(this);
     }
 
@@ -23,7 +29,7 @@ public class UvMap {
         {
             if (m.name.Equals(name)) return m;
         }
-
+        //Debug.Log("uv map not found");
         return new UvMap("empty", new Vector2[0]);
     }
 }

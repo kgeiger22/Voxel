@@ -9,6 +9,9 @@ public class World : ILoopable
     public static World _instance { get; private set; }
     private bool IsRunning;
     private Thread worldThread;
+    private int WorldHeight = 3;
+    private int WorldWidth = 3;
+    private int WorldLength = 10;
    // private static Int3 playerPos;
    // private static readonly int RenderDistanceInChunks = 3;
     public static void Instantiate()
@@ -25,7 +28,7 @@ public class World : ILoopable
     {
         foreach (Chunk c in new List<Chunk>(_LoadedChunks))
         {
-            Serializer.Serialize_ToFile_FullPath(FileManager.GetChunkString(c.PosX, c.PosZ), c.GetChunkSaveData());
+            Serializer.Serialize_ToFile_FullPath(FileManager.GetChunkString(c.PosX, c.PosY, c.PosZ), c.GetChunkSaveData());
 
         }
         IsRunning = false;
@@ -55,18 +58,21 @@ public class World : ILoopable
                         RanOnce = true;
 
 
-                        for (int x = 0; x < 5; x++)
+                        for (int x = 0; x < WorldWidth; ++x)
                         {
-                            for (int z = 0; z < 5; z++)
+                            for (int z = 0; z < WorldLength; ++z)
                             {
-                                Int3 newChunkPos = new Int3(x,0,z);
-
-                                if (System.IO.File.Exists(FileManager.GetChunkString(newChunkPos.x, newChunkPos.z)))
+                                for (int y = 0; y < WorldHeight; ++y)
                                 {
+                                    Int3 newChunkPos = new Int3(x, y, z);
 
-                                    _LoadedChunks.Add(new Chunk(newChunkPos.x, newChunkPos.z, Serializer.Deserialize_From_File<int[,,]>(FileManager.GetChunkString(newChunkPos.x, newChunkPos.z)), this));
+                                    if (System.IO.File.Exists(FileManager.GetChunkString(newChunkPos.x, newChunkPos.y, newChunkPos.z)))
+                                    {
+
+                                        _LoadedChunks.Add(new Chunk(newChunkPos.x, newChunkPos.y, newChunkPos.z, Serializer.Deserialize_From_File<int[,,]>(FileManager.GetChunkString(newChunkPos.x, newChunkPos.y, newChunkPos.z)), this));
+                                    }
+                                    else _LoadedChunks.Add(new Chunk(newChunkPos.x, newChunkPos.y, newChunkPos.z, this));
                                 }
-                                else _LoadedChunks.Add(new Chunk(newChunkPos.x, newChunkPos.z, this));
                             }
                         }
 
@@ -162,21 +168,26 @@ public class World : ILoopable
 
     public bool BlockCollision(Vector3 p)
     {
-        if (p.y > Chunk.ChunkHeight || p.y < 0) return false;
+        if (p.y > WorldHeight * Chunk.ChunkHeight || p.y < 0) return false;
         int pxtochunk = Mathf.FloorToInt(p.x) / Chunk.ChunkWidth;
+        if (p.x < 0) pxtochunk -= 1;
         int pztochunk = Mathf.FloorToInt(p.z) / Chunk.ChunkWidth;
+        if (p.z < 0) pztochunk -= 1;
+        int pytochunk = Mathf.FloorToInt(p.y) / Chunk.ChunkHeight;
 
-        
-        if (!ChunkExists(pxtochunk, pztochunk)) return false;
+
+
+        if (!ChunkExists(pxtochunk, pytochunk, pztochunk)) return false;
         else
         {
-            Chunk c = GetChunk(pxtochunk, pztochunk);
+            Chunk c = GetChunk(pxtochunk, pytochunk, pztochunk);
 
             int pxtoblock = (Mathf.FloorToInt(p.x) - (pxtochunk) * Chunk.ChunkWidth);
+            int pytoblock = (Mathf.FloorToInt(p.y) - (pytochunk) * Chunk.ChunkHeight);
             int pztoblock = (Mathf.FloorToInt(p.z) - (pztochunk) * Chunk.ChunkWidth);
             //Debug.Log(string.Format("PX: {0}, {1}   PZ: {2}, {3}", pxtochunk, pxtoblock, pztochunk, pztoblock));
             if (pxtoblock < 0 || pxtoblock > 19 || pztoblock < 0 || pztoblock > 19) return false;
-            else if (c.GetBlockAt(pxtoblock, (Mathf.FloorToInt(p.y)), pztoblock) != "Air")
+            else if (c.GetBlockAt(pxtoblock, pytoblock, pztoblock) != "Air")
             {
                 //Debug.Log(string.Format("PX: {0}, {1}  PY: {2}, {3}   PZ: {4}, {5}", pxtochunk, pxtoblock, 0, Mathf.FloorToInt(p.y), pztochunk, pztoblock));
                 return true;
@@ -185,11 +196,11 @@ public class World : ILoopable
         }
     }
 
-    public bool ChunkExists(int posx, int posz)
+    public bool ChunkExists(int posx, int posy, int posz)
     {
         foreach (Chunk c in new List<Chunk>(_LoadedChunks))
         {
-            if (c.PosX.Equals(posx) && c.PosZ.Equals(posz))
+            if (c.PosX.Equals(posx) && c.PosY.Equals(posy) && c.PosZ.Equals(posz))
             {
                 return true;
             }
@@ -197,16 +208,16 @@ public class World : ILoopable
         return false;
     }
 
-    public Chunk GetChunk(int posx, int posz)
+    public Chunk GetChunk(int posx, int posy, int posz)
     {
         foreach (Chunk c in new List<Chunk>(_LoadedChunks))
         {
-            if (c.PosX.Equals(posx) && c.PosZ.Equals(posz))
+            if (c.PosX.Equals(posx) && c.PosY.Equals(posy) && c.PosZ.Equals(posz))
             {
                 return c;
             }
         }
-        return new ErroredChunk(0, 0, this);
+        return new ErroredChunk(0, 0, 0, this);
     }
 
     public void Update()

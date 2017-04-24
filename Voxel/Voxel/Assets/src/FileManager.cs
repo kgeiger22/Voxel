@@ -9,8 +9,8 @@ public class FileManager {
     {
         Serializer.Check_Gen_Folder(ChunkSaveDirectory);
     }
-    public static string GetChunkString(int x, int z)
+    public static string GetChunkString(int x, int y, int z)
     {
-        return string.Format("{0}C_{1}_{2}.chk", ChunkSaveDirectory, x, z);
+        return string.Format("{0}C_{1}_{2}_{3}.chk", ChunkSaveDirectory, x, y, z);
     }
 }

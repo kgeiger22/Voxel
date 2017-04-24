@@ -87,9 +87,11 @@
     <Compile Include="Assets\src\Block.cs" />
     <Compile Include="Assets\src\BlockData.cs" />
     <Compile Include="Assets\src\BlockRegistry.cs" />
+    <Compile Include="Assets\src\Builder.cs" />
     <Compile Include="Assets\src\Character.cs" />
     <Compile Include="Assets\src\Chunk.cs" />
     <Compile Include="Assets\src\DevChunk.cs" />
+    <Compile Include="Assets\src\Dragon.cs" />
     <Compile Include="Assets\src\ErroredChunk.cs" />
     <Compile Include="Assets\src\Explosion.cs" />
     <Compile Include="Assets\src\Extentions.cs" />
@@ -102,8 +104,12 @@
     <Compile Include="Assets\src\MainLoopable.cs" />
     <Compile Include="Assets\src\MathHelper.cs" />
     <Compile Include="Assets\src\MeshData.cs" />
+    <Compile Include="Assets\src\Player.cs" />
     <Compile Include="Assets\src\Projectile.cs" />
+    <Compile Include="Assets\src\SMGBullet.cs" />
+    <Compile Include="Assets\src\Scout.cs" />
     <Compile Include="Assets\src\Serializer.cs" />
+    <Compile Include="Assets\src\SmoothCamera.cs" />
     <Compile Include="Assets\src\TextureAtlas.cs" />
     <Compile Include="Assets\src\UvMap.cs" />
     <Compile Include="Assets\src\World.cs" />
