@@ -11,6 +11,7 @@ public class Fireball : Projectile {
         lifetime = 8;
         velocity = 100;
         transform.Rotate(-5, 0, 0);
+        damage = player.damage;
         GetComponent<Rigidbody>().velocity = transform.forward.normalized * velocity;
     }
 
@@ -29,12 +30,15 @@ public class Fireball : Projectile {
 
     protected override void Explode()
     {
-        player.world.DestroyBlocks(transform.position + transform.forward.normalized * 0.5f, explosionsize);
+        player.world.DamageBlocks(transform.position + transform.forward.normalized * 0.5f, explosionsize, damage);
         Instantiate(Resources.Load<Transform>("FireballExplosion"), transform.position, Quaternion.identity);
         Transform PE = transform.FindChild("FireTrail");
-        PE.GetComponent<Explosion>().enabled = true;
-        PE.GetComponent<ParticleSystem>().Stop();
-        PE.transform.parent = null;
+        if (PE != null)
+        {
+            PE.GetComponent<Explosion>().enabled = true;
+            PE.GetComponent<ParticleSystem>().Stop();
+            PE.transform.parent = null;
+        }
         Destroy(gameObject);
     }
 }

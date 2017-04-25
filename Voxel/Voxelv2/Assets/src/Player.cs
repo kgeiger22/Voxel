@@ -49,6 +49,7 @@ public class Player : MonoBehaviour
     protected bool IsFiring = false;
     protected float cooldown = 1;
     protected float firerate = 1;
+    public int damage = 0;
 
 
     // Use this for initialization

@@ -26,6 +26,7 @@ public class Dragon : Player
         m_GravityMultiplier = 2.75f;
         firerate = 2;
         cooldown = 0;
+        damage = 200;
 }
 
 

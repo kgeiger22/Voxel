@@ -11,11 +11,11 @@ public class World : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        for (int x = -12; x < 12; x++)
+        for (int x = -6; x < 6; x++)
         {
-            for (int y = -2; y < 8; y++)
+            for (int y = -1; y < 4; y++)
             {
-                for (int z = -12; z < 12; z++)
+                for (int z = -6; z < 6; z++)
                 {
                     CreateChunk(x * Chunk.chunkSize, y * Chunk.chunkSize, z * Chunk.chunkSize);
                 }
@@ -106,8 +106,36 @@ public class World : MonoBehaviour {
     {
         SetBlock(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y), Mathf.RoundToInt(pos.z), block);
     }
+    private void DamageBlock(int x, int y, int z, int damage)
+    {
+        Chunk chunk = GetChunk(x, y, z);
 
-    public void DestroyBlocks(Vector3 startingpos, int explosionsize)
+        if (chunk != null)
+        {
+            Block block = chunk.GetBlock(x - chunk.pos.x, y - chunk.pos.y, z - chunk.pos.z);
+            if (block.health <= 0) return;
+            else block.health -= damage;
+
+            if (block.health <= 0)
+            {
+                chunk.SetBlock(x - chunk.pos.x, y - chunk.pos.y, z - chunk.pos.z, new BlockAir());
+                chunk.update = true;
+
+                UpdateIfEqual(x - chunk.pos.x, 0, new WorldPos(x - 1, y, z));
+                UpdateIfEqual(x - chunk.pos.x, Chunk.chunkSize - 1, new WorldPos(x + 1, y, z));
+                UpdateIfEqual(y - chunk.pos.y, 0, new WorldPos(x, y - 1, z));
+                UpdateIfEqual(y - chunk.pos.y, Chunk.chunkSize - 1, new WorldPos(x, y + 1, z));
+                UpdateIfEqual(z - chunk.pos.z, 0, new WorldPos(x, y, z - 1));
+                UpdateIfEqual(z - chunk.pos.z, Chunk.chunkSize - 1, new WorldPos(x, y, z + 1));
+            }
+        }
+    }
+    private void DamageBlock(Vector3 pos, int damage)
+    {
+        DamageBlock(Mathf.RoundToInt(pos.x), Mathf.RoundToInt(pos.y), Mathf.RoundToInt(pos.z), damage);
+    }
+    
+    public void DamageBlocks(Vector3 startingpos, int explosionsize, int damage)
     {
         for (int x = -explosionsize; x <= explosionsize; ++x)
         {
@@ -115,8 +143,9 @@ public class World : MonoBehaviour {
             {
                 for (int z = -explosionsize; z <= explosionsize; ++z)
                 {
-                    if (Mathf.Sqrt(x*x + y*y + z*z) < explosionsize + 0.5f)
-                        SetBlock(startingpos + new Vector3(x, y, z), new BlockAir());
+                    float distance = Mathf.Sqrt(x * x + y * y + z * z);
+                    int newdamage = damage / (Mathf.FloorToInt(distance + 1.5f));
+                    DamageBlock(startingpos + new Vector3(x, y, z), newdamage);
                 }
             }
         }
@@ -137,7 +166,7 @@ public class World : MonoBehaviour {
     {
         foreach(KeyValuePair<WorldPos, Chunk> c in chunks)
         {
-            Serialization.SaveChunk(c.Value);
+            //Serialization.SaveChunk(c.Value);
         }
     }
 }

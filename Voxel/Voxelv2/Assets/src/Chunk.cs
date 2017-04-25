@@ -8,7 +8,7 @@ using System.Collections;
 
 public class Chunk : MonoBehaviour
 {
-    public static int chunkSize = 8;
+    public static int chunkSize = 16;
     public Block[,,] blocks = new Block[chunkSize, chunkSize, chunkSize];
     public bool update = true;
     MeshFilter filter;

@@ -7,6 +7,7 @@ public class Projectile : MonoBehaviour {
     public float lifetime { get; protected set; }
     public float velocity { get; protected set; }
     public Player player = null;
+    public int damage = 0;
 
     protected virtual void Start()
     {

@@ -94,6 +94,7 @@
     <Compile Include="Assets\src\Dragon.cs" />
     <Compile Include="Assets\src\EditTerrain.cs" />
     <Compile Include="Assets\src\Explosion.cs" />
+    <Compile Include="Assets\src\FPSDisplay.cs" />
     <Compile Include="Assets\src\Fireball.cs" />
     <Compile Include="Assets\src\ImpactReceiver.cs" />
     <Compile Include="Assets\src\MeshData.cs" />

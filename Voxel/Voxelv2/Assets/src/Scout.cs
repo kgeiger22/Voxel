@@ -19,6 +19,7 @@ public class Scout : Player
         m_JumpBob.BobAmount = 0.05f;
         firerate = 20;
         cooldown = 0;
+        damage = 50;
     }
 
 

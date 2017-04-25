@@ -10,6 +10,7 @@ public class SMGBullet : Projectile {
         base.Start();
         lifetime = 0.2f;
         velocity = 180;
+        damage = player.damage;
         GetComponent<Rigidbody>().velocity = transform.forward.normalized * velocity;
     }
 
@@ -22,7 +23,7 @@ public class SMGBullet : Projectile {
 
     protected override void Explode()
     {
-        player.world.DestroyBlocks(transform.position + transform.forward.normalized * 0.5f, explosionsize);
+        player.world.DamageBlocks(transform.position + transform.forward.normalized * 0.5f, explosionsize, player.damage);
         Instantiate(Resources.Load<Transform>("SMGExplosion"), transform.position, Quaternion.identity);
         Destroy(gameObject);
     }

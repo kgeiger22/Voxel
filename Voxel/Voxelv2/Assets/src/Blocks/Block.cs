@@ -6,6 +6,7 @@ using System;
 public class Block
 {
     public BlockType type;
+    public int health = 100;
     //Base block constructor
     public Block()
     {

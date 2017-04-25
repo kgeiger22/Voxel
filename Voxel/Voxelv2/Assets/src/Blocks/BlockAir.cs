@@ -9,6 +9,7 @@ public class BlockAir : Block
         : base()
     {
         type = BlockType.Air;
+        health = 0;
     }
     public override MeshData Blockdata
         (Chunk chunk, int x, int y, int z, MeshData meshData)
