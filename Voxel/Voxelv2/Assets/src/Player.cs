@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(AudioSource))]
-public class Player : MonoBehaviour
+public abstract class Player : MonoBehaviour
 {
 
     [SerializeField] protected bool m_IsWalking = false;
@@ -47,9 +47,7 @@ public class Player : MonoBehaviour
     protected string type = "Generic";
     public World world = null;
     protected bool IsFiring = false;
-    protected float cooldown = 1;
-    protected float firerate = 1;
-    public int damage = 0;
+    protected Weapon weapon;
 
 
     // Use this for initialization
@@ -76,51 +74,11 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        //CHANGE CLASS
-        if (Input.GetKeyDown(KeyCode.F1))
-        {
-            if (!type.Equals("Builder"))
-            {
-                Builder b = gameObject.GetComponent<Builder>();
-                b.enabled = true;
-                this.enabled = false;
-                return;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.F2))
-        {
-            if (!type.Equals("Dragon"))
-
-            {
-                //gameObject.AddComponent<Dragon>().Start();
-                Dragon d = gameObject.GetComponent<Dragon>();
-                d.enabled = true;
-                this.enabled = false;
-                return;
-
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.F3))
-        {
-            if (!type.Equals("Scout"))
-            {
-                //gameObject.AddComponent<Scout>();
-                Scout s = gameObject.GetComponent<Scout>();
-                s.enabled = true;
-                this.enabled = false;
-
-                return;
-
-            }
-        }
+        GetAbilityInput();
 
         RotateView();
         // the jump state needs to read here to make sure it is not missed
 
-        if (!m_Jump)
-        {
-            m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
-        }
 
         if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
         {
@@ -141,10 +99,9 @@ public class Player : MonoBehaviour
 
     protected virtual void FixedUpdate()
     {
-        CheckFiring();
 
         float speed;
-        GetInput(out speed);
+        GetMovementInput(out speed);
         // always move along the camera forward as it is the direction that it being aimed at
         Vector3 desiredMove = transform.forward * m_Input.y + transform.right * m_Input.x;
 
@@ -188,6 +145,7 @@ public class Player : MonoBehaviour
                 else
                 {
                     m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime;
+                    if (m_MoveDir.y < 0) m_Jumping = false;
                 }
             }
         }
@@ -197,20 +155,6 @@ public class Player : MonoBehaviour
         UpdateCameraPosition(speed);
 
         m_MouseLook.UpdateCursorLock();
-    }
-
-
-    protected void CheckFiring()
-    {
-        if (IsFiring && cooldown < 0)
-        {
-            Shoot();
-            cooldown = 1 / firerate;
-        }
-        else cooldown -= Time.deltaTime;
-    }
-    protected virtual void Shoot()
-    {
     }
 
     protected void Jump(float jump_multiplier = 1)
@@ -295,7 +239,7 @@ public class Player : MonoBehaviour
         m_MouseLook.LookRotation(transform, m_Camera.transform);
     }
 
-    protected virtual void GetInput(out float speed)
+    protected virtual void GetMovementInput(out float speed)
     {
         // Read input
         float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
@@ -310,21 +254,61 @@ public class Player : MonoBehaviour
             m_Input.Normalize();
         }
     }
-    
-    protected void OnControllerColliderHit(ControllerColliderHit hit)
+    protected virtual void GetAbilityInput()
     {
-        Rigidbody body = hit.collider.attachedRigidbody;
-        //dont move the rigidbody if the character is on top of it
-        if (m_CollisionFlags == CollisionFlags.Below)
+        //CHANGE CLASS
+        if (Input.GetKeyDown(KeyCode.F1))
         {
-            return;
+            if (!type.Equals("Builder"))
+            {
+                Builder b = gameObject.GetComponent<Builder>();
+                b.enabled = true;
+                this.enabled = false;
+                return;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.F2))
+        {
+            if (!type.Equals("Dragon"))
+
+            {
+                //gameObject.AddComponent<Dragon>().Start();
+                Dragon d = gameObject.GetComponent<Dragon>();
+                d.enabled = true;
+                this.enabled = false;
+                return;
+
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.F3))
+        {
+            if (!type.Equals("Scout"))
+            {
+                //gameObject.AddComponent<Scout>();
+                Scout s = gameObject.GetComponent<Scout>();
+                s.enabled = true;
+                this.enabled = false;
+
+                return;
+
+            }
         }
 
-        if (body == null || body.isKinematic)
+        if (!m_Jump)
         {
-            return;
+            m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
         }
-        body.AddForceAtPosition(m_CharacterController.velocity * 0.1f, hit.point, ForceMode.Impulse);
     }
+    
+    protected virtual void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Rigidbody body = hit.collider.attachedRigidbody;
+        if (m_CollisionFlags != CollisionFlags.Below && body != null && !body.isKinematic)
+            body.AddForceAtPosition(m_CharacterController.velocity * 0.1f, hit.point, ForceMode.Impulse);
+        if (m_CollisionFlags == CollisionFlags.Above && m_MoveDir.y > 2)
+            m_MoveDir.y *= -0.4f;
+    }
+
+    protected abstract void LoadWeapon();
 }
 

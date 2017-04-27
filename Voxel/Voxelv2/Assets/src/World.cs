@@ -4,13 +4,21 @@ using UnityEngine;
 
 public class World : MonoBehaviour {
 
+    public static World WorldInstance;
+
     public Dictionary<WorldPos, Chunk> chunks = new Dictionary<WorldPos, Chunk>();
     public GameObject chunkPrefab;
     public string worldName = "world";
 
+    void Awake()
+    {
+        Application.targetFrameRate = 90;
+    }
+
     // Use this for initialization
     void Start()
     {
+        WorldInstance = this;
         for (int x = -6; x < 6; x++)
         {
             for (int y = -1; y < 4; y++)

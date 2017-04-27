@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ public class Builder : Player {
 
             Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100) && hit.distance > 0.5)
+            if (Physics.Raycast(ray, out hit, 30, ~(1 << 8)))
             {
                 EditTerrain.SetBlock(hit, new BlockDirt(), true);
             }
@@ -45,7 +46,7 @@ public class Builder : Player {
         {
             Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100) && hit.distance > 0.5)
+            if (Physics.Raycast(ray, out hit, 30, ~(1 << 8)))
             {
                 Add.transform.GetComponent<MeshRenderer>().enabled = true;
                 Vector3 rawposition = hit.point + hit.normal / 2;
@@ -64,7 +65,7 @@ public class Builder : Player {
 
             Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100) && hit.distance > 0.5)
+            if (Physics.Raycast(ray, out hit, 30, ~(1 << 8)))
             {
                 EditTerrain.SetBlock(hit, new BlockAir());
             }
@@ -76,7 +77,7 @@ public class Builder : Player {
 
             Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100) && hit.distance > 0.5)
+            if (Physics.Raycast(ray, out hit, 30, ~(1 << 8)))
             {
                 Delete.transform.GetComponent<MeshRenderer>().enabled = true;
                 Vector3 rawposition = hit.point - hit.normal / 2;
@@ -85,5 +86,10 @@ public class Builder : Player {
             }
             else Delete.transform.GetComponent<MeshRenderer>().enabled = false;
         }
+    }
+
+    protected override void LoadWeapon()
+    {
+        
     }
 }

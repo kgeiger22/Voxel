@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Projectile : MonoBehaviour {
+public abstract class Projectile : MonoBehaviour {
 
     public float lifetime { get; protected set; }
     public float velocity { get; protected set; }
-    public Player player = null;
+    public int explosionsize = -1;
     public int damage = 0;
 
     protected virtual void Start()
     {
     }
-
-
+    
     protected virtual void Update()
     {
         lifetime -= Time.deltaTime;
@@ -30,10 +29,6 @@ public class Projectile : MonoBehaviour {
     {
         Destroy(gameObject);
     }
-
-
-
-
-
+    
 
 }

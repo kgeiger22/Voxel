@@ -12,10 +12,11 @@ public class Dragon : Player
     private bool m_Flying = false;
     private float m_FlyingSpeed = 0;
     private bool ResetAcc = false;
-    private bool righthand = true;
+    private bool IsCharging = false;
+    private float charge;
     Vector3 dashspeed = new Vector3(0, 0, 0);
 
-    // Use this for initialization
+    
     protected override void Start()
     {
         base.Start();
@@ -24,44 +25,24 @@ public class Dragon : Player
         m_JumpSpeed = 20;
         m_CanFly = true;
         m_GravityMultiplier = 2.75f;
-        firerate = 2;
-        cooldown = 0;
-        damage = 200;
-}
-
-
-    //private List<Vector3> WaitingToAddBlocks = new List<Vector3>();
-    // Update is called once per frame
+        LoadWeapon();
+    }
+    
+    
     protected override void Update()
     {
         base.Update();
-
-        if (Input.GetMouseButton(0) && cooldown < 0)
-        {
-            IsFiring = true;
-        }
-        else IsFiring = false;
-
-        if (Input.GetKeyDown(KeyCode.LeftShift))// && shiftcooldown < 0)
-        {
-            m_Dash = true;
-            shiftcooldown = shiftrate;
-        }
-        else shiftcooldown -= Time.deltaTime;
-
     }
 
     protected override void FixedUpdate()
     {
-        if (IsFiring && cooldown < 0)
-        {
-            Shoot();
-            cooldown = 1 / firerate;
-        }
-        else cooldown -= Time.deltaTime;
 
         float speed;
-        GetInput(out speed);
+        GetMovementInput(out speed);
+        if (IsFiring)
+        {
+            weapon.TriggerPrimaryFire();
+        }
         // always move along the camera forward as it is the direction that it being aimed at
         Vector3 desiredMove = transform.forward * m_Input.y + transform.right * m_Input.x;
 
@@ -165,29 +146,43 @@ public class Dragon : Player
         m_MouseLook.UpdateCursorLock();
     }
 
-    protected override void GetInput(out float speed)
+    protected override void GetMovementInput(out float speed)
     {
-        base.GetInput(out speed);
+        base.GetMovementInput(out speed);
         if (m_Flying) speed = m_FlyingSpeed;
     }
-
-    protected override void Shoot()
+    protected override void GetAbilityInput()
     {
-        Vector3 startpos = transform.position + new Vector3(0, 0.3f, 0);
-        Projectile fireball = Instantiate(Resources.Load<Projectile>("Fireball"), startpos, Camera.main.transform.rotation);
-        fireball.player = this;
-        if (righthand)
+        base.GetAbilityInput();
+        if (Input.GetMouseButton(0))
         {
-            fireball.transform.position += fireball.transform.right.normalized * 1.0f;
-            fireball.transform.RotateAround(fireball.transform.position, fireball.transform.up, -0.6f);
+            IsFiring = true;
+        }
+        else IsFiring = false;
+        if (Input.GetMouseButtonUp(1) && IsCharging)
+        {
+            weapon.TriggerSecondaryFire();
+        }
+        if (Input.GetMouseButton(1))
+        {
+            IsFiring = false;
+            IsCharging = true;
+            weapon.ChargeWeapon();
+        }
+        else IsCharging = false;
 
-        }
-        else
+        if (Input.GetKeyDown(KeyCode.LeftShift))// && shiftcooldown < 0)
         {
-            fireball.transform.position += fireball.transform.right.normalized * -1.0f;
-            fireball.transform.RotateAround(fireball.transform.position, fireball.transform.up, 0.6f);
+            m_Dash = true;
+            shiftcooldown = shiftrate;
         }
-        righthand = !righthand;
+        else shiftcooldown -= Time.deltaTime;
+    }
+
+    protected override void LoadWeapon()
+    {
+        weapon = Instantiate(Resources.Load<Weapon>("Weapons/FlameCannon"), transform.position, Camera.main.transform.rotation);
+        weapon.transform.parent = this.transform;
     }
 }
 

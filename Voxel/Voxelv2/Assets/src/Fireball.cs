@@ -1,21 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Fireball : Projectile {
-    
-	// Use this for initialization
-	override protected void Start ()
+public class Fireball : Projectile
+{
+
+    public float charge = 0;
+    private float chargeTime = 0.5f;
+    // Use this for initialization
+    override protected void Start()
     {
         base.Start();
-        lifetime = 8;
-        velocity = 100;
         transform.Rotate(-5, 0, 0);
-        damage = player.damage;
         GetComponent<Rigidbody>().velocity = transform.forward.normalized * velocity;
     }
-
-    private int explosionsize = 1;
 
     private void FixedUpdate()
     {
@@ -30,8 +29,9 @@ public class Fireball : Projectile {
 
     protected override void Explode()
     {
-        player.world.DamageBlocks(transform.position + transform.forward.normalized * 0.5f, explosionsize, damage);
-        Instantiate(Resources.Load<Transform>("FireballExplosion"), transform.position, Quaternion.identity);
+        World.WorldInstance.DamageBlocks(transform.position + transform.forward.normalized * 0.5f, explosionsize, damage);
+        Transform explosion = Instantiate(Resources.Load<Transform>("Fireball/FireballExplosion"), transform.position, Quaternion.identity);
+        explosion.localScale *= explosionsize;
         Transform PE = transform.FindChild("FireTrail");
         if (PE != null)
         {
@@ -40,5 +40,17 @@ public class Fireball : Projectile {
             PE.transform.parent = null;
         }
         Destroy(gameObject);
+    }
+
+    public void LoadFromWeapon(FlameCannon weapon)
+    {
+        charge = weapon.GetCharge();
+        int chargemultiplier = Mathf.Min(Mathf.FloorToInt(charge / chargeTime), 2) + 1;
+        damage = (int)(weapon.GetDamage() * (1 + (chargemultiplier - 1) / 2.0f));
+        explosionsize = weapon.GetExplosionSize() * chargemultiplier;
+        lifetime = 6 + 2 * chargemultiplier;
+        velocity = velocity = 80 + 20 * chargemultiplier;
+        transform.localScale *= chargemultiplier;
+        transform.GetChild(0).localScale *= chargemultiplier;
     }
 }

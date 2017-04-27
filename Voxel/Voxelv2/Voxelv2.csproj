@@ -84,6 +84,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\src\Akimbo.cs" />
+    <Compile Include="Assets\src\AkimboBullet.cs" />
     <Compile Include="Assets\src\Blocks\Block.cs" />
     <Compile Include="Assets\src\Blocks\BlockAir.cs" />
     <Compile Include="Assets\src\Blocks\BlockDirt.cs" />
@@ -96,16 +98,17 @@
     <Compile Include="Assets\src\Explosion.cs" />
     <Compile Include="Assets\src\FPSDisplay.cs" />
     <Compile Include="Assets\src\Fireball.cs" />
+    <Compile Include="Assets\src\FlameCannon.cs" />
     <Compile Include="Assets\src\ImpactReceiver.cs" />
     <Compile Include="Assets\src\MeshData.cs" />
     <Compile Include="Assets\src\Modify.cs" />
     <Compile Include="Assets\src\Noise.cs" />
     <Compile Include="Assets\src\Player.cs" />
     <Compile Include="Assets\src\Projectile.cs" />
-    <Compile Include="Assets\src\SMGBullet.cs" />
     <Compile Include="Assets\src\Scout.cs" />
     <Compile Include="Assets\src\Serialization.cs" />
     <Compile Include="Assets\src\TerrainGen.cs" />
+    <Compile Include="Assets\src\Weapon.cs" />
     <Compile Include="Assets\src\World.cs" />
     <Compile Include="Assets\src\WorldPos.cs" />
   </ItemGroup>
